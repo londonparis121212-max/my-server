@@ -23,9 +23,9 @@ def activate_key():
     if request.method == 'POST':
         data = request.get_json()
         if data:
-            print(f"📥 POST: key={data.get('key')}, deviceId={data.get('deviceId')}")
+            print(f"POST: key={data.get('key')}, deviceId={data.get('deviceId')}")
     
-    # ✅ ПРАВИЛЬНЫЙ ОТВЕТ (без лишних полей)
+    # ✅ ПРАВИЛЬНЫЙ ОТВЕТ
     return jsonify({
         "status": "ok",
         "valid": True,
