@@ -5,6 +5,16 @@ import os
 app = Flask(__name__)
 EXPIRE_TIME = int(datetime(2100, 1, 1).timestamp() * 1000)
 
+# 📌 НОВЫЙ ОБРАБОТЧИК POST-ЗАПРОСОВ НА КОРЕНЬ "/"
+@app.route('/', methods=['POST'])
+def index_post():
+    print("📥 Получен POST-запрос на корень /")
+    return jsonify({
+        "status": "ok",
+        "valid": True,
+        "expiresAt": EXPIRE_TIME
+    })
+
 @app.route('/', methods=['GET'])
 def index():
     return jsonify({
@@ -13,19 +23,13 @@ def index():
         "message": "VPN Blocker Server Active"
     })
 
-@app.route('/health', methods=['GET'])
-def health():
-    return jsonify({"status": "healthy"})
-
 @app.route('/api/activate-key', methods=['GET', 'POST'])
 def activate_key():
-    # Логируем запрос (для отладки)
     if request.method == 'POST':
         data = request.get_json()
         if data:
-            print(f"POST: key={data.get('key')}, deviceId={data.get('deviceId')}")
+            print(f"📥 POST на /api/activate-key: key={data.get('key')}")
     
-    # ✅ ПРАВИЛЬНЫЙ ОТВЕТ
     return jsonify({
         "status": "ok",
         "valid": True,
