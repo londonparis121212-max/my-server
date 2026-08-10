@@ -1,40 +1,31 @@
 from flask import Flask, request, jsonify
-from datetime import datetime
 import os
+import json
+from datetime import datetime
 
 app = Flask(__name__)
-EXPIRE_TIME = int(datetime(2100, 1, 1).timestamp() * 1000)
+EXPIRE_TIME = 4102444800000  # 2100 год
 
-# 📌 НОВЫЙ ОБРАБОТЧИК POST-ЗАПРОСОВ НА КОРЕНЬ "/"
-@app.route('/', methods=['POST'])
-def index_post():
-    print("📥 Получен POST-запрос на корень /")
-    return jsonify({
-        "status": "ok",
-        "valid": True,
-        "expiresAt": EXPIRE_TIME
-    })
-
-@app.route('/', methods=['GET'])
-def index():
-    return jsonify({
-        "status": "ok",
-        "valid": True,
-        "message": "VPN Blocker Server Active"
-    })
-
-@app.route('/api/activate-key', methods=['GET', 'POST'])
-def activate_key():
-    if request.method == 'POST':
-        data = request.get_json()
-        if data:
-            print(f"📥 POST на /api/activate-key: key={data.get('key')}")
+# 📌 ГЛАВНОЕ — перехватываем ВСЕ пути и методы
+@app.route('/', defaults={'path': ''}, methods=['GET', 'POST', 'PUT', 'DELETE', 'HEAD'])
+@app.route('/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE', 'HEAD'])
+def catch_all(path):
+    print(f"📥 ПЕРЕХВАЧЕНО: {request.method} /{path}")
+    print(f"📦 Заголовки: {dict(request.headers)}")
+    if request.get_json(silent=True):
+        print(f"📦 Тело: {request.get_json(silent=True)}")
     
+    # Ответ, который говорит "Оплата прошла, доступ есть"
     return jsonify({
         "status": "ok",
         "valid": True,
-        "expiresAt": EXPIRE_TIME
-    })
+        "expiresAt": EXPIRE_TIME,
+        "payment": {
+            "status": "paid",
+            "days": 9999
+        },
+        "message": "Access granted via custom server"
+    }), 200
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
